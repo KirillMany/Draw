@@ -1,0 +1,1509 @@
+# -*- coding: cp1251 -*-
+from Tkinter import *
+import win32com.client
+import os
+import tkMessageBox
+import shutil
+import win32clipboard
+import time
+import win32com.client as win32
+import sys
+import subprocess
+
+ws = Tk()
+ws.title(u'Калькулятор коробок')
+ws.geometry('600x300')
+ws.config(bg = '#F2B90B')
+
+header12 = Label(text = u"ВВЕДИТЕ № СЧЕТА", padx = 7, pady = 3)
+header12.place(x = 100, y = 20)
+#вводим виджет для номера счета
+box_order = StringVar()
+box_order_number = Entry(textvariable = box_order)
+box_order_number.place(x = 20, y = 20, width = 70)
+
+def Click_button():
+    #проверим если в папке есть уже файлы
+    a = u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    b = newfolder.get()
+    g = a+b
+    try:
+        rez = sorted(os.listdir(g))#сортируем все файлы в папке
+        rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+        
+        rez3=(list(filter(lambda x: x.startswith('0'), rez2))) #выбираем значение у тех файлов,которые начинаются с 0
+        rez4=[str(x) for x in rez3]#преобразовываем все значения в строку
+    except WindowsError:
+            tkMessageBox.showinfo(title=u"Внимание!", message=u"Такой папки нет!")            
+    if len(rez4)==0:
+        try:
+            shutil.copyfile("U:\\Peppers\\03_Прайсы\\Коробки Прайс\\Калькулятор.xls", g+"\\001" + ".xls")
+        except IOError:
+            tkMessageBox.showinfo(title=u"Внимание!", message=u"Такой папки нет!")
+            
+    else:
+        rez5=rez4[-1]#выбираем последний по номеру подбор
+        rez5=int(rez5.replace('.xls', ''))#убираем лишнее расширение и меняем на число
+        rez6=str(rez5+1)#строка для пути
+        #закинем подбор в папку
+        try:
+            if rez5<9:
+                shutil.copyfile("U:\\Peppers\\03_Прайсы\\Коробки Прайс\\Калькулятор.xls", g+"\\00" + rez6 + ".xls")
+            elif 8<rez5<99:
+                shutil.copyfile("U:\\Peppers\\03_Прайсы\\Коробки Прайс\\Калькулятор.xls", g+"\\0" + rez6 + ".xls")
+            elif 98<rez5<999:
+                shutil.copyfile("U:\\Peppers\\03_Прайсы\\Коробки Прайс\\Калькулятор.xls", g+"\\" + rez6 + ".xls")
+        except IOError:
+            tkMessageBox.showinfo(title=u"Внимание!", message=u"Такой папки нет!")
+            
+
+def Click_button2():
+    #определим ячейки для ввода пути к папке
+    a = u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    b=newfolder.get()
+    g=a+b
+    try:
+        os.mkdir(g)
+    except WindowsError:
+        tkMessageBox.showinfo(title=u"Внимание!", message=u"Такая папка уже есть!")
+
+     
+btn1 = Button(text=u"Добавить файл подбора", background="#555", foreground="#ccc",
+             padx="20", pady="8", font="16", command=Click_button)
+btn1.pack()
+btn1.place(x=300, y=80)
+#надпись для номера заявки
+header22 = Label(text=u"ВВЕДИТЕ № ЗАЯВКИ", padx=7, pady=3)
+header22.place(x=380, y=20)
+#вводим виджет для номера заявки
+newfolder = StringVar()
+newfolder_entry = Entry(textvariable=newfolder)
+newfolder_entry.place(x=300, y=20, width=70)
+
+#параметры кнопки для создания папки
+btnRead=Button(text=u"Создать новую папку", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button2)
+btnRead.pack()
+btnRead.place(x=300, y=50)
+
+def Click_button3():
+    #откроем папку
+    a = u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    b=newfolder.get()
+    g=a+b
+    try:
+        os.startfile(g)
+    except WindowsError:
+        tkMessageBox.showinfo(title=u"Внимание!", message=u"Такой папки нет!")
+
+    
+#параметры кнопки для создания папки
+btnOpen=Button(text=u"Открыть папку", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button3)
+btnOpen.pack()
+btnOpen.place(x=300, y=130)
+
+def Click_button4():
+    aa= u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    bb=newfolder.get()
+    path=aa+bb
+    rez = sorted(os.listdir(path))#сортируем все файлы в папке
+    rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+    rez3=[str(x) for x in rez2]#преобразовываем все значения в строку
+    
+    Excel = win32com.client.Dispatch("Excel.Application")
+    Excel.Visible=True
+    p=len(rez3)
+    for k in range(1,p+1):
+        x=rez3[k-1]
+        wb = Excel.Workbooks.Open(r"U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\" +bb +'\\' + x)
+        sheet = wb.Worksheets(u'Главная')
+        
+
+#параметры кнопки для открытия всех файлов
+btnOpen1=Button(text=u"Открыть все подборы", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button4)
+btnOpen1.pack()
+btnOpen1.place(x=300, y=160)
+
+def Click_button5():
+    #действие для кнопки для присвоения артикулов
+    aa= u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    bb=newfolder.get()
+    path=aa+bb
+    rez = sorted(os.listdir(path))#сортируем все файлы в папке
+    rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+    rez3=(list(filter(lambda x: len(x)==7, rez2))) #выбираем значение у тех файлов,где нет артикула
+    rez4=[str(x) for x in rez3]#преобразовываем все значения в строку
+    rez5=[str(x) for x in rez2]#преобразовываем все значения в строку
+    th1=len(rez5)-len(rez4)#первые файлы уже с артикулом (кол-во)
+    
+    Excel = win32com.client.Dispatch("Excel.Application")
+    
+    p=len(rez4)
+    #открываем по очереди все файлы и копируем в файл данные
+    for k in range(1,p+1):
+        x=rez4[k-1]
+        wb = Excel.Workbooks.Open(r"U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\" +bb +'\\' + x)
+        sheet = wb.Worksheets(u'Главная')
+        
+        y=sheet.Cells(66,29).value
+                
+        sheet.Cells(70,12).value=u'Основное типоисполнение'
+        sheet.Cells(181,12).value=u'Основное типоисполнение'
+        sheet.Cells(351,12).value=u'Основное типоисполнение'
+        sheet.Cells(453,12).value=u'Основное типоисполнение'
+        
+        z1=sheet.Cells(73,1).value
+        z2=sheet.Cells(184,1).value
+        z3=sheet.Cells(354,1).value
+        z4=sheet.Cells(389,1).value
+        z5=sheet.Cells(457,1).value
+        d=str(th1+k)
+        if z4=='':
+            y=str(y)
+            #уберем лишний пробел и РР
+            yy=y.replace('PP', '', 1)
+            yy=yy.replace('AP', '', 1)
+            yyy=yy.replace(' ', '', 1)
+        else:
+            y=sheet.Cells(389,1).value
+            yyy=y.replace(' ', '', 1)
+            yyy=yyy.encode('cp1251')
+            
+                
+        p1=z1.encode('cp1251')
+        p2=z2.encode('cp1251')
+        p3=z3.encode('cp1251')
+        p4=z4.encode('cp1251')
+        p5=z5.encode('cp1251')
+        if z5!=u'Не CAS':
+            yyy=z5
+            yyy=yyy.split(u"к")[0]
+            yyy=yyy[:-3]
+            
+        
+        f = open("U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\" +bb +'\\'+'1C.txt', "a")
+        if (th1+k)==1:
+            f.write('№ п.п.	Тип корпуса	Краткое описание')
+        f.write('\n' + d +'	' + yyy +  '	' )
+        if z1==u'Не коробка' and z2==u'Не пост управления Exed' and z3==u'Не шкаф управления'and z5==u'Не CAS':
+            f.write(p4)
+        if z1==u'Не коробка' and z2==u'Не пост управления Exed' and z4==''and z5==u'Не CAS':
+            f.write(p3)
+        if z1==u'Не коробка' and z3==u'Не шкаф управления' and z4==''and z5==u'Не CAS':
+            f.write(p2)
+        if z2==u'Не пост управления Exed' and z3==u'Не шкаф управления' and z4==''and z5==u'Не CAS':
+            f.write(p1)
+        if z5!=u'Не CAS':
+            f.write(p5)
+            
+        f.close
+        wb.Close(True)
+
+        
+#копируем в буфер обмена
+def write(e):
+    aa= u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    bb=newfolder.get()
+    cc=aa+bb
+    ws.clipboard_clear()
+    ws.clipboard_append(cc)       
+        
+#параметры кнопки для артикулов
+btnOpen2=Button(text=u"Присвоить артикулы", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button5)
+btnOpen2.pack()
+btnOpen2.place(x=300, y=192)
+btnOpen2.bind("<Button-1>",write)
+
+
+def Click_button55():
+    #действие для кнопки для переименования файлов
+    aa= u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    bb=newfolder.get()
+    path=aa+bb
+    rez = sorted(os.listdir(path))#сортируем все файлы в папке
+    rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+    
+    rez4=(list(filter(lambda x: x.endswith(bb+'.txt'), rez))) #выбираем значение у тех файлов,у которых заканчивается на номер заявки
+    rez5=[str(x) for x in rez4]#преобразовываем все значения в строку
+    
+    f = open(path + '\\' + rez4[0], "r")
+       
+    i=0
+    for x in rez2:
+        i=i+1
+        old_file = os.path.join(path, x)
+        t=f.readline()
+        t=t.split()
+        if i<10:
+            new_file = os.path.join(path, '00'+str(i)+'-'+t[1]+".xls")
+        else:
+            new_file = os.path.join(path, '0'+str(i)+'-'+t[1]+".xls")
+        os.rename(old_file, new_file)
+    
+    f.close
+        
+
+#параметры кнопки для переименования файлов
+btnOpen22=Button(text=u"Переименовать файлы", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button55)
+btnOpen22.pack()
+btnOpen22.place(x=300, y=224)
+
+def Click_button6():
+    Excel = win32com.client.Dispatch("Excel.Application")
+    Excel.Visible=True
+    a=u'C:\\Users\\k.itimenev\\Desktop\\'
+    b=box_order.get()
+    path=a
+    rez = sorted(os.listdir(path))#сортируем все файлы в папке
+    rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+    rez3=(list(filter(lambda x: x.startswith(u'Счет покупателю №P000000'+b), rez2)))
+    for x in rez3:
+        x=x.encode('cp1251')
+        
+    wb = Excel.Workbooks.Open(r"C:\\Users\\k.itimenev\\Desktop\\" + x)
+    wb1 = Excel.Workbooks.Open(r"C:\\Users\\k.itimenev\\Desktop\\Шаблон")
+    sheet = wb.Worksheets('TDSheet')
+    
+    vals = [r[0].value for r in sheet.Range("B22:C49")]#для менеджера узнаем сколько позиций
+    vals2=list(filter(lambda x: type(x) is float, vals))#Достаем только числа
+    vals3=max([int(x) for x in vals2])#Достаем только числа целочисленные и возвращаем макс число
+    
+        
+    z1=sheet.Cells(11,2).value#счет
+    z2=sheet.Cells(17,8).value#компания
+    z3=sheet.Cells(37+vals3,29).value#менеджер
+    
+    sheet1 = wb1.Worksheets('TDSheet')
+    sheet1.Cells(3,2).value=z1
+    sheet1.Cells(6,8).value=z2.partition(',')[0]
+    sheet1.Cells(10,8).value=z3
+    for x in range(0,35):
+        if x is not None:
+            z4=sheet.Cells(22+x,25).value#кол-во в счете
+            sheet1.Cells(15+x,10).value=z4#кол-во в листе заказа
+                    
+    for x in range(0,35):
+        if x is not None:
+            z5=sheet.Cells(22+x,4).value#первый+ артикул в счете
+            sheet1.Cells(15+x,4).value=z5#первый+ артикул в листе заказа
+
+    for x in range(0,34):
+        if sheet1.Cells(49-x,4).Value is None:
+            sheet1.Cells(49-x,4).EntireRow.Delete()
+    
+    c=z2.partition(',')[0]
+    c = c.replace('"', '')#убираем лишние кавычки
+    c = c.replace(u'Общество с ограниченной ответственностью', u'ООО')#сокращаем ООО
+    c = c.replace(u'Научно-производственное предприятие', u'НПП')#сокращаем ООО
+    c = c.replace(u'Закрытое акционерное общество', u'ЗАО')#сокращаем ЗАО 
+    if c[-1]==' ':
+        c=c[:-1]
+    g=a+b+'-'+c
+    try:
+        os.mkdir(g)
+    except WindowsError:
+        tkMessageBox.showinfo(title=u"Внимание!", message=u"Такая папка уже есть!")
+    
+    ww=g+ u"\\ЛИСТ ЗАКАЗА.xls"
+    wb1.Save
+    wb1.SaveAs(ww)
+    
+    vals4=[]
+
+    for i in range(0,vals3):
+        y=sheet.Cells(22+i,4).value
+        vals4.append(y)
+    #папки для заказа
+    g1=a+b+'-'+c+'\\'+u"Серия TM"
+    g2=a+b+'-'+c+'\\'+u"Серия ВM"
+    g3=a+b+'-'+c+'\\'+u"Серия CM"
+    g4=a+b+'-'+c+'\\'+u"Серия JB"
+    g5=a+b+'-'+c+'\\'+u"Серия PMH"
+    g6=a+b+'-'+c+'\\'+u"Серия UA"
+    g7=a+b+'-'+c+'\\'+u"Серия UB"
+    g8=a+b+'-'+c+'\\'+u"Серия PUAC"
+    g9=a+b+'-'+c+'\\'+u"Серия PUAS"
+    g10=a+b+'-'+c+'\\'+u"Серия TB"
+    g11=a+b+'-'+c+'\\'+u"Серия CB"
+    #узнаем что в списке
+
+    for x in vals4:
+        if x==None:
+            x='a'
+        x=x[:2]
+        if x=='TM':
+            try:
+                os.mkdir(g1)
+            except WindowsError:
+                pass
+            
+        if x=='BM':
+            try:
+                os.mkdir(g2)
+            except WindowsError:
+                pass
+            
+        if x=='CM':
+            try:
+                os.mkdir(g3)
+            except WindowsError:
+                pass
+            
+        if x=='AJ' or x=='PJ':
+            try:
+                os.mkdir(g4)
+            except WindowsError:
+                pass
+        if x=='TB':
+            try:
+                os.mkdir(g10)
+            except WindowsError:
+                pass
+        if x=='CB':
+            try:
+                os.mkdir(g11)
+            except WindowsError:
+                pass
+    vals4=[]               
+    for i in range(0,vals3):
+        y=sheet.Cells(22+i,4).value
+        vals4.append(y)
+        
+    for x in vals4:
+        if x==None:
+            x='a'
+        x=x[:3]
+        if x=='PUB':
+            try:
+                os.mkdir(g7)
+            except WindowsError:
+                pass
+    vals4=[]               
+    for i in range(0,vals3):
+        y=sheet.Cells(22+i,4).value
+        vals4.append(y)        
+    for x in vals4:
+        if x==None:
+            x='a'
+        x=x[:4]
+        if x=='PUAC':
+            try:
+                os.mkdir(g8)
+            except WindowsError:
+                pass
+            
+        if x=='PUAS':
+            try:
+                os.mkdir(g9)
+            except WindowsError:
+                pass
+            
+        if x=='PMH9':
+            try:
+                os.mkdir(g5)
+            except WindowsError:
+                pass
+            
+        if x=='PUA6':
+            try:
+                os.mkdir(g6)
+            except WindowsError:
+                pass
+    gg1=g1+u"\\РЭ-ТМ.docx"
+    gg2=g2+u"\\РЭ-ВМ.docx"
+    gg3=g3+u"\\РЭ-CM.docx"
+    gg4=g4+u"\\Паспорт JB.docx"
+    gg5=g5+u"\\Паспорт PMH.docx"
+    gg6=g6+u"\\Паспорт UA.docx"
+    gg7=g7+u"\\Паспорт UB.docx"
+    gg8=g8+u"\\Паспорт PUAC.docx"
+    gg9=g9+u"\\Паспорт PUAS.docx"
+    gg10=g10+u"\\Паспорт TB.docx"
+    gg11=g11+u"\\Паспорт CB.docx"
+    
+    gg11=g1+u"\\сертификат ТР ТС.pdf"
+    gg22=g2+u"\\сертификат ТР ТС.pdf"
+    gg33=g3+u"\\сертификат ТР ТС.pdf"
+    gg44=g4+u"\\TR_TC_Ex_d.pdf"
+    gg55=g5+u"\\TR_TC_Ex_d.pdf"
+    gg66=g6+u"\\TR_TC_Ex_d.pdf"
+    gg77=g7+u"\\TR_TC_Ex_d.pdf"
+    gg88=g8+u"\\TR_TC_Ex_d.pdf"
+    gg99=g9+u"\\TR_TC_Ex_d.pdf"
+    gg1010=g10+u"\\ТР ТС НКУ.pdf"
+    gg1111=g11+u"\\ТР ТС НКУ.pdf"
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\РЭ-ТМ.docx",gg1)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\сертификат ТР ТС.pdf",gg11)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\РЭ-ВМ.docx",gg2)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\сертификат ТР ТС.pdf",gg22)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\РЭ-CM.docx",gg3)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\УУМ\\сертификат ТР ТС.pdf",gg33)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт JB.docx",gg4)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg44)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт PMH.docx",gg5)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg55)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт UA.docx",gg6)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg66)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт UB.docx",gg7)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg77)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт PUAC.docx",gg8)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg88)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\Паспорт PUAS.docx",gg9)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Ex d\\сертификат ТР ТС.pdf",gg99)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Общепром\\РЭ-ТB.docx",gg10)
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Общепром\\ТР ТС НКУ.pdf",gg1010)
+    except IOError:
+        n=0
+    try:
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Общепром\\РЭ-СB.docx",g11+u"\\Паспорт CB.docx")
+        shutil.copyfile("U:\\Peppers\\08_Производство\\Бланки паспортов\\Общепром\\ТР ТС НКУ.pdf",g11+u"\\ТР ТС НКУ.pdf")
+    except IOError:
+        n=0
+   
+    #скопируем все файлы чертежей в папки если есть
+    
+    #посмотрим каждую ячейку на предмет названия чертежа
+    i=0
+    for y in range(0,50):
+        i=i+1
+        name = sheet.Cells(21+i,4).value
+        
+        if name is None:
+            break
+        else:
+            name= name[:2]+' '+name[2:]
+            name2=name+' CX.pdf'
+            name=name+'.pdf'
+            name=str(name)
+            name2=str(name2)
+            try:
+                path = 'U:\\Peppers\\10_Проектирование\\~АрхивЧертежей~\\Архив УУМ\\Архив ПДФ\\Лит. А\\'
+                for dirs,folder,files in os.walk(path):
+                    if name in files:
+                        x=os.path.join(dirs,name)
+                        x2=os.path.join(dirs,name2)
+                        if name.startswith(u'TM'):
+                            shutil.copyfile(x,g1+'\\'+name)
+                            shutil.copyfile(x2,g1+'\\'+name2)
+                        if name.startswith(u'BM'):
+                            shutil.copyfile(x,g2+'\\'+name)
+                            shutil.copyfile(x2,g2+'\\'+name2)
+                        if name.startswith(u'CM'):
+                            shutil.copyfile(x,g3+'\\'+name)
+                            shutil.copyfile(x2,g3+'\\'+name2)
+                path = 'U:\\Peppers\\10_Проектирование\\~АрхивЧертежей~\\Общепром\\Архив ПДФ\\Лит. А\\'
+                for dirs,folder,files in os.walk(path):
+                    if name in files:
+                        x=os.path.join(dirs,name)
+                        x2=os.path.join(dirs,name2)
+                        if name.startswith(u'TB'):
+                            shutil.copyfile(x,g10+'\\'+name)
+                            shutil.copyfile(x2,g10+'\\'+name2)
+                        if name.startswith(u'CB'):
+                            shutil.copyfile(x,g11+'\\'+name)
+                            shutil.copyfile(x2,g11+'\\'+name2)
+                path = 'U:\\Peppers\\10_Проектирование\\~АрхивЧертежей~\\Архив Ex d\\Архив ПДФ\\Лит. А\\'
+                name=name.replace(" ", "")
+                name2=name2.replace(" ", "",1)
+                for dirs,folder,files in os.walk(path):
+                    if name in files:
+                        x=os.path.join(dirs,name)
+                        x2=os.path.join(dirs,name2)
+                        if name.startswith(u'JB')or name.startswith(u'AJ'):
+                            shutil.copyfile(x,g4+'\\'+name)
+                            shutil.copyfile(x2,g4+'\\'+name2)
+                        if name.startswith(u'PMH'):
+                            shutil.copyfile(x,g5+'\\'+name)
+                            shutil.copyfile(x2,g5+'\\'+name2)
+                        if name.startswith(u'UA') and PUAC not in name and PUAS not in name:
+                            shutil.copyfile(x,g6+'\\'+name)
+                            shutil.copyfile(x2,g6+'\\'+name2)
+                        if name.startswith(u'UB'):
+                            shutil.copyfile(x,g7+'\\'+name)
+                            shutil.copyfile(x2,g7+'\\'+name2)
+                        if name.startswith(u'PUAC'):
+                            shutil.copyfile(x,g8+'\\'+name)
+                            shutil.copyfile(x2,g8+'\\'+name2)
+                        if name.startswith(u'PUAS'):
+                            shutil.copyfile(x,g9+'\\'+name)
+                            shutil.copyfile(x2,g9+'\\'+name2)
+            except IOError:
+                pass
+                    
+    #скопируем файлы паспорта на кабельные вводы
+    i=0
+    #посмотрим каждую ячейку на предмет кабельного ввода
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g4+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g4+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g4+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g4+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g4+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g4+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g4+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g4+u"\\АЛФ.pdf")
+            if u'АРФ' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g4+u"\\АРФ.pdf")
+            if u'АУФ' in x and u'JB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g4+u"\\АУФ.pdf")
+    i=0            
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g1+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g1+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g1+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g1+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g1+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g1+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g1+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g1+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g1+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g1+u"\\АУФ.pdf")
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g2+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g2+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g2+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g2+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g2+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g2+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g2+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g2+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g2+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g2+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g3+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g3+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g3+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g3+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g3+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g3+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g3+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g3+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g3+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g3+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g5+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g5+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g5+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g5+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g5+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g5+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g5+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g5+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g5+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'PMH'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g5+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g6+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g6+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g6+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g6+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g6+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g6+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g6+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g6+u"\\АЛФ.pdf")
+            if u'АРФ' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g6+u"\\АРФ.pdf")
+            if u'АУФ' in x and u'UA' in x and u'PUAC' not in x and u'PUAS' not in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g6+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g7+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g7+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g7+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g7+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g7+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g7+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g7+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g7+u"\\АЛФ.pdf")
+            if u'АРФ' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g7+u"\\АРФ.pdf")
+            if u'АУФ' in x and u'UB' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g7+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g8+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g8+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g8+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g8+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g8+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g8+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g8+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g8+u"\\АЛФ.pdf")
+            if u'АРФ' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g8+u"\\АРФ.pdf")
+            if u'АУФ' in x and u'PUAC' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g8+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g9+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g9+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g9+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g9+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g9+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g9+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g9+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g9+u"\\АЛФ.pdf")
+            if u'АРФ' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g9+u"\\АРФ.pdf")
+            if u'АУФ' in x and u'PUAS' in x:
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g9+u"\\АУФ.pdf")
+
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g10+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g10+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g10+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g10+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g10+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g10+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g10+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g10+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g10+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g10+u"\\АУФ.pdf")
+        
+    i=0
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        if x is None:
+            break
+        else:
+            if u'A3RCC' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxRCxxx.pdf",g11+u"\\Инструкция AxRCxxx.pdf")
+            if u'A3L' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция AxLxx.pdf",g11+u"\\Инструкция AxLxx.pdf")
+            if u'E3' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ExxxxFx.pdf",g11+u"\\Инструкция ExxxxFx.pdf")
+            if u'A8BF' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция A8xF (D8XxF, E8XxF).pdf",g11+u"\\Инструкция A8xF (D8XxF, E8XxF).pdf")
+            if u'CR-C' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-Cxxx.pdf",g11+u"\\Инструкция CR-Cxxx.pdf")
+            if u'CR3' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция CR-xxx.pdf",g11+u"\\Инструкция CR-xxx.pdf")
+            if u'ACDP' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\Инструкция ACDP.pdf",g11+u"\\Инструкция ACDP.pdf")
+            if u'АЛФ' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АЛФ.pdf",g11+u"\\АЛФ.pdf")
+            if u'АРФ' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АРФ.pdf",g11+u"\\АРФ.pdf")
+            if u'АУФ' in x and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на кабельные вводы\\PDF\\ТГК\\АУФ.pdf",g11+u"\\АУФ.pdf")
+
+    #скопируем файлы инструкции на кабельные вводы
+    i=0
+    #посмотрим каждую ячейку на предмет крепежных скоб,петли,зажим
+    for x in range(0,50):
+        i=i+1
+        x = sheet.Cells(21+i,8).value
+        
+        if x is None:
+            break
+        else:
+            x1=x[x.find("+") + 4:]
+            x2=x1.partition('-')[0]
+            if '7' in x2 and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ крепежные скобы.docx",g1+u"\\+ крепежные скобы.docx")
+            if '7' in x2 and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ крепежные скобы.docx",g2+u"\\+ крепежные скобы.docx")
+            if '7' in x2 and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ крепежные скобы.docx",g3+u"\\+ крепежные скобы.docx")
+            if '7' in x2 and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ крепежные скобы.docx",g10+u"\\+ крепежные скобы.docx")
+            if '7' in x2 and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ крепежные скобы.docx",g11+u"\\+ крепежные скобы.docx")
+            if '6' in x2 and x.startswith(u'TM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ внешние шарниры.docx",g1+u"\\+ внешние шарниры.docx")
+            if '6' in x2 and x.startswith(u'BM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ внешние шарниры.docx",g2+u"\\+ внешние шарниры.docx")
+            if '6' in x2 and x.startswith(u'CM'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ внешние шарниры.docx",g3+u"\\+ внешние шарниры.docx")
+            if '6' in x2 and x.startswith(u'TB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ внешние шарниры.docx",g10+u"\\+ внешние шарниры.docx")
+            if '6' in x2 and x.startswith(u'CB'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ внешние шарниры.docx",g11+u"\\+ внешние шарниры.docx")
+            if x.startswith(u'TM A'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ зажим для алюминия.docx",g1+u"\\+ зажим для алюминия.docx")
+            if x.startswith(u'BM A'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ зажим для алюминия.docx",g2+u"\\+ зажим для алюминия.docx")
+            if x.startswith(u'CM A'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ зажим для алюминия.docx",g3+u"\\+ зажим для алюминия.docx")
+            if x.startswith(u'TB A'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ зажим для алюминия.docx",g10+u"\\+ зажим для алюминия.docx")
+            if x.startswith(u'CB A'):
+                shutil.copyfile("U:\\Peppers\\08_Производство\\Инструкции\\Инструкции на доп. опции\\+ зажим для алюминия.docx",g11+u"\\+ зажим для алюминия.docx")
+            
+        
+    #создадим папку с шильдами
+    www=a+b+'-'+c+'\\'+u'Шильдики'
+    os.mkdir(www)
+    #кидаем туда счет
+    wwww=www +"\\"+ b
+    wb.SaveAs(wwww)
+    
+    Excel.Application.Quit()
+
+    
+#параметры кнопки артикулов
+btnOpen3=Button(text=u"Собрать Производство", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button6)
+btnOpen3.pack()
+btnOpen3.place(x=20, y=50)    
+
+def Click_button7():
+    Excel = win32com.client.Dispatch("Excel.Application")
+    sheet = Excel.ActiveWorkbook.Sheets(u'Главная')
+    
+    p1=sheet.Cells(10,10).value
+    p2=sheet.Cells(14,8).value
+    p3=sheet.Cells(66,25).value
+    p4=sheet.Cells(10,9).value
+    
+    if (p1 == u'e' or p1 == u'ia') and p2 == u'Горизонтально':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exg(v2).py"])
+        code.communicate()
+    if (p1 == u'e' or p1 == u'ia') and p2 == u'Вертикально':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exv.py"])
+        code.communicate()
+    if p1 == u'd' and p2 == u'Горизонтально' and p3 != u'PUA6':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exdg.py"])
+        code.communicate()
+    if p1 == u'd' and p2 == u'Вертикально':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exdv(v2).py"])
+        code.communicate()
+    if p1 == u'd' and p2 == u'Горизонтально' and p3 == u'PUA6':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Guat.py"])
+        code.communicate()
+    if p1 == u'ed' and p2 == u'Горизонтально':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\CMg.py"])
+        code.communicate()
+    if (p4 == u'IP') and p2 == u'Горизонтально':
+        code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\IPg(v2).py"])
+        code.communicate()
+    
+    
+#параметры кнопки для черчения
+btnOpen4=Button(text=u"Чертеж открытого файла", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button7)
+btnOpen4.pack()
+btnOpen4.place(x=20, y=180)
+
+def Click_button77():
+    b=newfolder.get()#номер папки
+    Excel = win32com.client.Dispatch("Excel.Application")
+    Excel.Visible=True
+    a=u'U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\'
+    path=a+b
+    rez = sorted(os.listdir(path))#сортируем все файлы в папке
+    rez2=(list(filter(lambda x: x.endswith('.xls'), rez))) #выбираем значение у тех файлов,где есть .xls
+    rez3=[str(x) for x in rez2]#преобразовываем все значения в строку
+    for x in rez3:
+        wb = Excel.Workbooks.Open(r"U:\\Peppers\\10_Проектирование\\~Заявки~\\2023\\"+b +'\\'+ x)
+        sheet1 = wb.Worksheets(u'Главная')
+        p1=sheet1.Cells(10,10).value
+        p2=sheet1.Cells(14,8).value
+        p3=sheet1.Cells(66,25).value
+        p4=sheet1.Cells(10,9).value
+        time.sleep(3)
+        if (p1 == u'e' or p1 == u'ia') and p2 == u'Горизонтально':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exg(v2).py"])
+            code.communicate()
+        if (p1 == u'e' or p1 == u'ia') and p2 == u'Вертикально':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exv.py"])
+            code.communicate()
+        if p1 == u'd' and p2 == u'Горизонтально' and p3 != u'PUA6':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exdg.py"])
+            code.communicate()
+        if p1 == u'd' and p2 == u'Вертикально':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Exdv(v2).py"])
+            code.communicate()
+        if p1 == u'd' and p2 == u'Горизонтально' and p3 == u'PUA6':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\Guat.py"])
+            code.communicate()
+        if p1 == u'ed' and p2 == u'Горизонтально':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\CMg.py"])
+            code.communicate()
+        if (p4 == u'IP') and p2 == u'Горизонтально':
+            code = subprocess.Popen([sys.executable, "C:\Users\k.itimenev\Desktop\CAD2\IPg(v2).py"])
+            code.communicate()
+        
+        
+#параметры кнопки для черчения
+btnOpen44=Button(text=u"Чертеж всех файлов из заявки", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button77)
+btnOpen44.pack()
+btnOpen44.place(x=20, y=210) 
+
+  
+def Click_button8():
+    #откроем txt с серийниками
+    a=u'C:\\Users\\k.itimenev\\Desktop\\'
+    b=box_order.get()#название папки
+    srez=sorted(os.listdir(a))#сортируем все файлы на рабочем столе
+    srez2=(list(filter(lambda x: x.startswith(b), srez))) #выбираем папку которая начинается с номера счета
+    d=srez2[0]
+    path1=u'C:\\Users\\k.itimenev\\Desktop\\'+d+u'\\Шильдики\\'
+    rezz = sorted(os.listdir(path1))#сортируем все файлы в папке
+    rezz2=(list(filter(lambda x: x.endswith('.txt'), rezz))) #выбираем значение у тех файлов,где есть .txt
+    try:
+        f1 = open(path1+rezz2[0], "r")
+    except IndexError:
+        tkMessageBox.showinfo(title=u"Внимание!", message=u"Серийников нет в папке!")
+
+    #откроем эксель для заполнения таблицы
+    Excel = win32com.client.Dispatch("Excel.Application")
+    Excel.Visible=False
+    word = win32com.client.Dispatch('Word.Application')
+    word.Visible=True
+    wb = Excel.Workbooks.Open(r"C:\\Users\\k.itimenev\\Desktop\\test.xlsx")
+    
+    sheet = wb.Worksheets(u'Лист1')
+    #сначала обнулим таблицу
+    for x in range(0,30):
+        sheet.Cells(2+x,1).value = ''
+        sheet.Cells(2+x,3).value = ''
+    for x in range(0,30):
+        sheet.Cells(2+x,4).value = ''
+        sheet.Cells(2+x,6).value = ''
+        
+    #прочитаем тхт и присвоим таблице значения
+    #для артикула
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(1+i,1).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(1+i,4).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(1+i,3).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(1+i,6).value = n
+            
+    #уберем лишние повторяющиеся артикулы
+    for x in reversed(range(30)):
+        if sheet.Cells(2+x,1).value == sheet.Cells(1+x,1).value:
+            sheet.Cells(2+x,1).value=''
+
+    for x in reversed(range(30)):
+        if sheet.Cells(2+x,4).value == sheet.Cells(1+x,4).value:
+            sheet.Cells(2+x,4).value=''
+        
+        
+    #скопируем таблицу1 в ворд   
+    x = sheet.Range('A1:F31').Copy()
+    doc = word.Documents.Add()
+    word.Selection.PasteExcelTable(False, True, False)
+       
+    #doc.Close(True)
+    #word.Application.Quit()
+    
+    #выполним вторую таблицу
+    #сначала обнулим таблицу
+    for x in range(0,30):
+        sheet.Cells(33+x,1).value = ''
+        sheet.Cells(33+x,3).value = ''
+    for x in range(0,30):
+        sheet.Cells(33+x,4).value = ''
+        sheet.Cells(33+x,6).value = ''
+        
+    #прочитаем тхт и присвоим таблице значения
+    #для артикула
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(32+i,1).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(32+i,4).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for k in range(60):
+        f1.readline()
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(32+i,3).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for k in range(90):
+        f1.readline()
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(32+i,6).value = n
+            
+    #уберем лишние повторяющиеся артикулы
+    for x in reversed(range(30)):
+        if sheet.Cells(33+x,1).value == sheet.Cells(32+x,1).value:
+            sheet.Cells(33+x,1).value=''
+
+    for x in reversed(range(30)):
+        if sheet.Cells(33+x,4).value == sheet.Cells(32+x,4).value:
+            sheet.Cells(33+x,4).value=''
+
+    #скопируем таблицу2 в ворд
+    if sheet.Cells(33,3).value is not None: 
+        x = sheet.Range('A32:F62').Copy()
+        doc = word.Documents.Add()
+        word.Visible = True
+        word.Selection.PasteExcelTable(False, True, False)
+    f1.close
+
+    #серийник с 121-180
+    #выполним тертью таблицу
+    #сначала обнулим таблицу
+    for x in range(0,30):
+        sheet.Cells(64+x,1).value = ''
+        sheet.Cells(64+x,3).value = ''
+    for x in range(0,30):
+        sheet.Cells(64+x,4).value = ''
+        sheet.Cells(64+x,6).value = ''
+        
+    f1 = open(path1+rezz2[0], "r")
+    #прочитаем тхт и присвоим таблице значения
+    #для артикула
+    for k in range(120):
+        f1.readline()
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(63+i,1).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(63+i,4).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for k in range(120):
+        f1.readline()
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(63+i,3).value = n
+    
+    #для серийника
+    i=0
+    
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(63+i,6).value = n
+            
+    #уберем лишние повторяющиеся артикулы
+    for x in reversed(range(30)):
+        if sheet.Cells(64+x,1).value == sheet.Cells(63+x,1).value:
+            sheet.Cells(64+x,1).value=''
+
+    for x in reversed(range(30)):
+        if sheet.Cells(64+x,4).value == sheet.Cells(63+x,4).value:
+            sheet.Cells(64+x,4).value=''
+    #скопируем таблицу3 в ворд
+    if sheet.Cells(64,3).value is not None:
+        x = sheet.Range('A63:F93').Copy()
+        doc = word.Documents.Add()
+        word.Visible = True
+        word.Selection.PasteExcelTable(False, True, False)
+    f1.close
+
+    #______________________________________________
+    #серийник с 181-240
+    #выполним 4ю таблицу
+    #сначала обнулим таблицу
+    for x in range(0,30):
+        sheet.Cells(95+x,1).value = ''
+        sheet.Cells(95+x,3).value = ''
+    for x in range(0,30):
+        sheet.Cells(95+x,4).value = ''
+        sheet.Cells(95+x,6).value = ''
+        
+    f1 = open(path1+rezz2[0], "r")
+    #прочитаем тхт и присвоим таблице значения
+    #для артикула
+    for k in range(180):
+        f1.readline()
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(94+i,1).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(94+i,4).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for k in range(180):
+        f1.readline()
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(94+i,3).value = n
+    
+    #для серийника
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(94+i,6).value = n
+            
+    #уберем лишние повторяющиеся артикулы
+    for x in reversed(range(30)):
+        if sheet.Cells(95+x,1).value == sheet.Cells(94+x,1).value:
+            sheet.Cells(95+x,1).value=''
+
+    for x in reversed(range(30)):
+        if sheet.Cells(95+x,4).value == sheet.Cells(94+x,4).value:
+            sheet.Cells(95+x,4).value=''
+    #скопируем таблицу4 в ворд
+    if sheet.Cells(95,3).value is not None:
+        x = sheet.Range('A94:F124').Copy()
+        doc = word.Documents.Add()
+        word.Visible = True
+        word.Selection.PasteExcelTable(False, True, False)
+    f1.close
+
+    #______________________________________________
+    #серийник с 241-300
+    #выполним 5ю таблицу
+    #сначала обнулим таблицу
+    for x in range(0,30):
+        sheet.Cells(126+x,1).value = ''
+        sheet.Cells(126+x,3).value = ''
+    for x in range(0,30):
+        sheet.Cells(126+x,4).value = ''
+        sheet.Cells(126+x,6).value = ''
+        
+    f1 = open(path1+rezz2[0], "r")
+    #прочитаем тхт и присвоим таблице значения
+    #для артикула
+    for k in range(240):
+        f1.readline()
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(125+i,1).value = n
+    i=0
+    for n in range(0,30):     
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            if len(n)==0:
+                n.append(' ')
+                n.append(' ')
+                n.append(' ')
+            if n[1]==u'CB':
+                n[1]=n[1]+n[2]
+                n[2]=n[3]
+            n=n[1]
+            sheet.Cells(125+i,4).value = n
+    f1.close
+    #откроем заново файл
+    f1 = open(path1+rezz2[0], "r")
+    #для серийника
+    i=0
+    for k in range(240):
+        f1.readline()
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(125+i,3).value = n
+    
+    #для серийника
+    i=0
+    for n in range(0,30):
+        i=i+1
+        n=f1.readline()
+        if len(n)>0:
+            n=n.split()
+            n=n[2]
+            sheet.Cells(125+i,6).value = n
+            
+    #уберем лишние повторяющиеся артикулы
+    for x in reversed(range(30)):
+        if sheet.Cells(126+x,1).value == sheet.Cells(125+x,1).value:
+            sheet.Cells(126+x,1).value=''
+
+    for x in reversed(range(30)):
+        if sheet.Cells(126+x,4).value == sheet.Cells(125+x,4).value:
+            sheet.Cells(126+x,4).value=''
+    #скопируем таблицу4 в ворд
+    if sheet.Cells(126,3).value is not None:
+        x = sheet.Range('A126:F155').Copy()
+        doc = word.Documents.Add()
+        word.Visible = True
+        word.Selection.PasteExcelTable(False, True, False)
+    f1.close
+
+    wb.Close(SaveChanges=True)
+    f1.close
+
+        
+#параметры кнопки для серийников
+btnOpen5=Button(text=u"Присвоить серийники", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button8)
+btnOpen5.pack()
+btnOpen5.place(x=20, y=82) 
+
+
+#параметры кнопки для черчения
+btnOpen4=Button(text=u"Чертеж открытого файла", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button7)
+btnOpen4.pack()
+btnOpen4.place(x=20, y=180)
+
+
+def Click_button88():
+    Excel = win32com.client.Dispatch("Excel.Application")
+    sheet = Excel.ActiveWorkbook.Sheets(u'Главная')
+    
+    sheet.Cells(10,10).value = u'd'
+    sheet.Cells(10,11).value = u'IIB'
+    sheet.Cells(12,8).value = u'Алюминий'
+    sheet.Cells(14,8).value = u'Вертикально'
+    sheet.Cells(20,8).value = u'нет'
+    sheet.Cells(24,8).value = u'да'
+    sheet.Cells(28,8).value = u'да'
+    sheet.Cells(30,8).value = u'да'
+    sheet.Cells(32,5).value = u'Ник. латунь'
+    sheet.Cells(66,25).value = u'670 x 470 x 377 A'
+           
+        
+#параметры кнопки для exd шаблона
+btnOpen66=Button(text=u"EXd", background="#333", foreground="#aaa",
+             padx="1", pady="1", font="1", command=Click_button88)
+btnOpen66.pack()
+btnOpen66.place(x=300, y=255) 
+
+# права 
+ws.mainloop()
